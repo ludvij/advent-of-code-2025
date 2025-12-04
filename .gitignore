@@ -18,3 +18,5 @@ Makefile
 .idea/
 .vs/
 inputs/
+
+session.txt
