@@ -9,11 +9,8 @@ project({year}_{day:02})
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(${{PROJECT_NAME}}_01)
-add_executable(${{PROJECT_NAME}}_02)
-
-target_sources(${{PROJECT_NAME}}_01 PRIVATE src/part1.cpp)
-target_sources(${{PROJECT_NAME}}_02 PRIVATE src/part2.cpp)
+add_executable(${{PROJECT_NAME}}_01 src/part1.cpp)
+add_executable(${{PROJECT_NAME}}_02 src/part2.cpp)
 
 target_link_libraries(${{PROJECT_NAME}}_01 PRIVATE ludutils)
 target_link_libraries(${{PROJECT_NAME}}_02 PRIVATE ludutils)
@@ -22,7 +19,7 @@ target_link_libraries(${{PROJECT_NAME}}_02 PRIVATE ludutils)
 main_cpp_format = """
 // https://adventofcode.com/{year}/day/{day}
 // Advent of code : {year}
-// day            : {day: 2}
+// day            : {day}
 // part           : {part}
 
 
@@ -49,6 +46,13 @@ int main(int argc, char** argv)
 }}
 """
 
+cmake_super_append_format = """
+add_subdirectory(day{day})
+
+set_target_properties(2025_{day:02}_01 PROPERTIES FOLDER "DAY{day:02}")
+set_target_properties(2025_{day:02}_02 PROPERTIES FOLDER "DAY{day:02}")
+"""
+
 def main():
 	if len(argv) < 2:
 		print(f'Usage: {argv[0]} number')
@@ -72,12 +76,7 @@ def main():
 			f.write(cmake_format.format(year=year, day=day))
 
 		with open('CMakeLists.txt', 'a', encoding='utf-8') as f:
-			f.write(f"""
-add_subdirectory(day{day})
-
-set_target_properties(2025_{day:02}_01 PROPERTIES FOLDER "DAY{day:02}")
-set_target_properties(2025_{day:02}_02 PROPERTIES FOLDER "DAY{day:02}")
-""")
+			f.write(cmake_super_append_format.format(year=year, day=day))
 
 	if not os.path.exists(cpp_part_1):
 		with open(cpp_part_1, 'w', encoding='utf-8') as f:
