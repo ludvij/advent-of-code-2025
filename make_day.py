@@ -1,5 +1,6 @@
 import os
 from sys import argv
+import subprocess
 
 cmake_format = """
 cmake_minimum_required(VERSION 3.31)
@@ -53,28 +54,51 @@ def main():
 		print(f'Usage: {argv[0]} number')
 		return
 	
-	day = int(argv[1])
+	day  = int(argv[1])
+	year = 2025
 	path = f'day{argv[1]}'
+
+	cpp_part_1 = f'{path}/src/part1.cpp'
+	cpp_part_2 = f'{path}/src/part2.cpp'
+	cmake_file = f'{path}/CMakeLists.txt'
+	input_file = f'inputs/day{day}/input.txt'
+
 
 	os.makedirs(f'{path}/src', exist_ok=True)
 	os.makedirs(f'inputs/day{day}', exist_ok=True)
 
-	with open(f'{path}/CMakeLists.txt', 'w', encoding='utf-8') as f:
-		f.write(cmake_format.format(year=2025, day=day))
+	if not os.path.exists(cmake_file):
+		with open(f'{path}/CMakeLists.txt', 'w', encoding='utf-8') as f:
+			f.write(cmake_format.format(year=year, day=day))
 
-	with open(f'{path}/src/part1.cpp', 'w', encoding='utf-8') as f:
-		f.write(main_cpp_format.format(year=2025, day=day, part=1))
-	
-	with open(f'{path}/src/part2.cpp', 'w', encoding='utf-8') as f:
-		f.write(main_cpp_format.format(year=2025, day=day, part=2))
-
-	with open('CMakeLists.txt', 'a', encoding='utf-8') as f:
-		f.write(f"""
+		with open('CMakeLists.txt', 'a', encoding='utf-8') as f:
+			f.write(f"""
 add_subdirectory(day{day})
 
 set_target_properties(2025_{day:02}_01 PROPERTIES FOLDER "DAY{day:02}")
 set_target_properties(2025_{day:02}_02 PROPERTIES FOLDER "DAY{day:02}")
 """)
+
+	if not os.path.exists(cpp_part_1):
+		with open(cpp_part_1, 'w', encoding='utf-8') as f:
+			f.write(main_cpp_format.format(year=year, day=day, part=1))
+
+	if not os.path.exists(cpp_part_2):
+		with open(cpp_part_2, 'w', encoding='utf-8') as f:
+			f.write(main_cpp_format.format(year=year, day=day, part=2))
+
+	if not os.path.exists(input_file):
+		with open('session.txt', 'r', encoding='utf-8') as f:
+			session = f.read()
+		# hacky but whatever, could install python-requests
+		with open(input_file, 'w', encoding='utf-8') as f:
+			subprocess.run([
+				'curl', 
+				'-A', f'https://github.com/ludvij/advent-of-code-{year}',
+				'-H', f'Cookie: session={session}',
+				f'https://adventofcode.com/{year}/day/{day}/input'
+			], stdout=f)
+
 
 
 if __name__ == '__main__':
