@@ -66,6 +66,7 @@ def main():
 	cpp_part_2 = f'{path}/src/part2.cpp'
 	cmake_file = f'{path}/CMakeLists.txt'
 	input_file = f'inputs/day{day}/input.txt'
+	test_file = f'inputs/day{day}/test.txt'
 
 
 	os.makedirs(f'{path}/src', exist_ok=True)
@@ -97,6 +98,8 @@ def main():
 				'-H', f'Cookie: session={session}',
 				f'https://adventofcode.com/{year}/day/{day}/input'
 			], stdout=f)
+		with open(test_file, 'w') as f:
+			pass
 
 
 
