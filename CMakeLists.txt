@@ -81,3 +81,8 @@ add_subdirectory("day4 - complete")
 
 set_target_properties(2025_04_01 PROPERTIES FOLDER "DAY04")
 set_target_properties(2025_04_02 PROPERTIES FOLDER "DAY04")
+
+add_subdirectory("day5 - complete")
+
+set_target_properties(2025_05_01 PROPERTIES FOLDER "DAY05")
+set_target_properties(2025_05_02 PROPERTIES FOLDER "DAY05")

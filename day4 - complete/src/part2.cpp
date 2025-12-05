@@ -13,6 +13,9 @@
 
 #define INPUT_PATH "inputs/day4/"
 
+// could be done using:
+// matric convolutions
+// floodfill
 auto do_program(auto path)
 {
     auto data = Lud::Slurp(path);
@@ -24,12 +27,7 @@ auto do_program(auto path)
     std::vector<std::vector<char>> cells;
     for (const auto& line : Lud::Split(data, '\n'))
     {
-        cells.emplace_back();
-        cells.back().reserve(line.size());
-        for (char c : line)
-        {
-            cells.back().push_back(c);
-        }
+        cells.emplace_back(line.begin(), line.end());
     }
     do
     {
@@ -44,26 +42,22 @@ auto do_program(auto path)
                     continue;
                 }
                 u8 count = 0;
-                for (s32 ay = -1; ay <= 1; ay++)
+                const s8 y_begin = y == 0 ? 0 : -1;
+                const s8 x_begin = x == 0 ? 0 : -1;
+                const s8 y_end = y == cells.size() - 1 ? 0 : 1;
+                const s8 x_end = x == cells[0].size() - 1 ? 0 : 1;
+
+                for (s8 ay = y_begin; ay <= y_end; ay++)
                 {
-                    for (s32 ax = -1; ax <= 1; ax++)
+                    for (s8 ax = x_begin; ax <= x_end; ax++)
                     {
-                        if ((ax == 0 && ay == 0) ||                 // current cell
-                            (ax < 0 && x == 0) ||                   // underflow
-                            (ay < 0 && y == 0) ||                   // underflow
-                            (ax > 0 && x == cells[0].size() - 1) || // overflow
-                            (ay > 0 && y == cells.size() - 1)       // overflow
-                        )
-                        {
-                            continue;
-                        }
                         if (cells[y + ay][x + ax] == '@')
                         {
                             count++;
                         }
                     }
                 }
-                if (count < 4)
+                if (count < 5)
                 {
                     last_removed++;
                     cells[y][x] = 'x';

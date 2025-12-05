@@ -38,26 +38,22 @@ auto do_program(auto path)
                 continue;
             }
             u8 count = 0;
-            for (s32 ay = -1; ay <= 1; ay++)
+            const s8 y_begin = y == 0 ? 0 : -1;
+            const s8 x_begin = x == 0 ? 0 : -1;
+            const s8 y_end = y == cells.size() - 1 ? 0 : 1;
+            const s8 x_end = x == cells[0].size() - 1 ? 0 : 1;
+
+            for (s8 ay = y_begin; ay <= y_end; ay++)
             {
-                for (s32 ax = -1; ax <= 1; ax++)
+                for (s8 ax = x_begin; ax <= x_end; ax++)
                 {
-                    if ((ax == 0 && ay == 0) ||                 // current cell
-                        (ax < 0 && x == 0) ||                   // underflow
-                        (ay < 0 && y == 0) ||                   // underflow
-                        (ax > 0 && x == cells[0].size() - 1) || // overflow
-                        (ay > 0 && y == cells.size() - 1)       // overflow
-                    )
-                    {
-                        continue;
-                    }
                     if (cells[y + ay][x + ax] == '@')
                     {
                         count++;
                     }
                 }
             }
-            if (count < 4)
+            if (count < 5)
             {
                 res++;
             }
