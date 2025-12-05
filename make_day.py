@@ -16,8 +16,7 @@ target_link_libraries(${{PROJECT_NAME}}_01 PRIVATE ludutils)
 target_link_libraries(${{PROJECT_NAME}}_02 PRIVATE ludutils)
 """
 
-main_cpp_format = """
-// https://adventofcode.com/{year}/day/{day}
+main_cpp_format = """// https://adventofcode.com/{year}/day/{day}
 // Advent of code : {year}
 // day            : {day}
 // part           : {part}

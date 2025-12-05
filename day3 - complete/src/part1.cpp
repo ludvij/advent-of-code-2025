@@ -1,4 +1,3 @@
-
 // https://adventofcode.com/2025/day/3
 // advent of code : 2025
 // day            : 3

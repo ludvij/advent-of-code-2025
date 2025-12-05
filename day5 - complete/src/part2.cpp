@@ -1,4 +1,3 @@
-
 // https://adventofcode.com/2025/day/5
 // Advent of code : 2025
 // day            : 5
@@ -28,12 +27,8 @@ auto do_program(auto path)
 
     u64 res = 0;
 
-    while (std::getline(file, line))
+    while (std::getline(file, line) && !line.empty())
     {
-        if (line.empty())
-        {
-            break;
-        }
         const auto parts = Lud::Split(line, '-');
         auto min = Lud::is_num<u64>(parts[0]).value();
         auto max = Lud::is_num<u64>(parts[1]).value();
