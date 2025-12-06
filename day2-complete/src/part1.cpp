@@ -14,7 +14,7 @@
 #define INPUT_PATH "inputs/day2/"
 
 // original string-based solution
-// auto do_program(auto path)
+// u64 do_program(const char* path)
 // {
 //     auto data = Lud::Slurp<std::string>(path);
 //     auto id_ranges = Lud::Split(data, ',');
@@ -45,7 +45,7 @@
 //     return res;
 // }
 
-auto do_program(auto path)
+u64 do_program(const char* path)
 {
     auto data = Lud::Slurp<std::string>(path);
     auto id_ranges = Lud::Split(data, ',');
