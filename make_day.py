@@ -2,8 +2,7 @@ import os
 from sys import argv
 import subprocess
 
-cmake_format = """
-cmake_minimum_required(VERSION 3.31)
+cmake_format = """cmake_minimum_required(VERSION 3.31)
 
 project({year}_{day:02})
 set(CMAKE_CXX_STANDARD 23)
@@ -21,15 +20,15 @@ main_cpp_format = """// https://adventofcode.com/{year}/day/{day}
 // day            : {day}
 // part           : {part}
 
-
 #include <print>
 
 #include <ludutils/lud_assert.hpp>
 #include <ludutils/lud_misc.hpp>
+#include <ludutils/lud_parse.hpp>
 
 #define INPUT_PATH "inputs/day{day}/"
 
-auto do_program(auto path)
+u64 do_program(const char* path)
 {{
     return 0U;
 }}

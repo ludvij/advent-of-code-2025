@@ -19,7 +19,7 @@ struct Range
     u64 max;
 };
 
-auto do_program(auto path)
+u64 do_program(const char* path)
 {
     std::ifstream file(path);
     std::string line;

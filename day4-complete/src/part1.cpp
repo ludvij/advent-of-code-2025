@@ -12,7 +12,7 @@
 
 #define INPUT_PATH "inputs/day4/"
 
-auto do_program(auto path)
+u64 do_program(const char* path)
 {
     auto data = Lud::Slurp(path);
 

@@ -62,7 +62,7 @@ bool binary_search(const std::span<Range> spn, u64 number)
     return false;
 }
 
-auto do_program(auto path)
+u64 do_program_bruteforce(const char* path)
 {
     std::ifstream file(path);
     std::string line;
@@ -114,9 +114,9 @@ auto do_program(auto path)
 
 int main(int argc, char** argv)
 {
-    Lud::assert::eq(do_program(INPUT_PATH "test.txt"), 3U);
+    Lud::assert::eq(do_program_bruteforce(INPUT_PATH "test.txt"), 3U);
 
-    auto result = do_program(INPUT_PATH "input.txt");
+    auto result = do_program_bruteforce(INPUT_PATH "input.txt");
 
     std::println("[RESULT]: {}", result);
     return 0;

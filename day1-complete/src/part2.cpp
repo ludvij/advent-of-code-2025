@@ -13,7 +13,7 @@
 
 #define INPUT_PATH "inputs/day1/"
 
-auto do_program(auto path)
+u64 do_program(const char* path)
 {
     std::ifstream stream(path);
 
