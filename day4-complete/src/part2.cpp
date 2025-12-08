@@ -172,22 +172,10 @@ auto do_program_bruteforce(auto path)
 
 int main(int argc, char** argv)
 {
-    Lud::assert::eq(do_program_bruteforce(INPUT_PATH "test.txt"), 43U);
     Lud::assert::eq(do_program_flood_fill(INPUT_PATH "test.txt"), 43U);
 
-    u64 floodfill_r, bruteforce_r;
-    {
-        Lud::Timer timer("bruteforce");
-        bruteforce_r = do_program_bruteforce(INPUT_PATH "input.txt");
-    }
+    u64 result = do_program_flood_fill(INPUT_PATH "input.txt");
 
-    {
-        Lud::Timer timer("floodfill");
-        floodfill_r = do_program_flood_fill(INPUT_PATH "input.txt");
-    }
-
-    Lud::assert::eq(floodfill_r, bruteforce_r);
-
-    std::println("[RESULT]: {}", bruteforce_r);
+    std::println("[RESULT]: {}", result);
     return 0;
 }

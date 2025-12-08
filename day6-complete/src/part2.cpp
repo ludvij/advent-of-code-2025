@@ -20,11 +20,6 @@ u64 parse_number(std::string_view x)
     return Lud::is_num<u64>(x).value();
 }
 
-char parse_operand(std::string_view x)
-{
-    return x[0];
-}
-
 // could just matix transpose this
 u64 do_program(const char* path)
 {
@@ -32,8 +27,8 @@ u64 do_program(const char* path)
 
     const auto lines = Lud::Split(file, '\n');
 
-    const auto operands = Lud::Split(lines.back(), ' ') |
-                          stdv::transform(parse_operand);
+    std::vector<char> operands;
+    std::ranges::copy_if(lines.back(), std::back_inserter(operands), [](char c) { return c != ' '; });
 
     const size_t cols = operands.size();
     const size_t rows = lines.size() - 1;
@@ -62,7 +57,7 @@ u64 do_program(const char* path)
 
     for (size_t col = 0; col < cols; col++)
     {
-        switch (operands[static_cast<ptrdiff_t>(col)])
+        switch (operands[col])
         {
         case '*':
             res += std::accumulate(columns[col].begin(), columns[col].end(), 1UL, std::multiplies<>());
