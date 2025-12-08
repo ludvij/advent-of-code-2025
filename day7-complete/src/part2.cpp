@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 {
     Lud::assert::eq(do_program(INPUT_PATH "test.txt"), 40U);
 
-    u64 result = do_program_memoization(INPUT_PATH "input.txt");
+    u64 result = do_program(INPUT_PATH "input.txt");
 
     std::println("[RESULT]: {}", result);
     return 0;

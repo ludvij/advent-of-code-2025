@@ -59,7 +59,6 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${output_dir})
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${output_dir}/lib)
 set (CMAKE_WORKING_DIRECTORY        ${CMAKE_SOURCE_DIR})
 
-
 add_subdirectory(ludutils)
 
 add_subdirectory(day1-complete)
@@ -96,3 +95,8 @@ add_subdirectory(day7-complete)
 
 set_target_properties(2025_07_01 PROPERTIES FOLDER "DAY07")
 set_target_properties(2025_07_02 PROPERTIES FOLDER "DAY07")
+
+add_subdirectory(day8)
+
+set_target_properties(2025_08_01 PROPERTIES FOLDER "DAY08")
+set_target_properties(2025_08_02 PROPERTIES FOLDER "DAY08")
