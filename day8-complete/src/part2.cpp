@@ -3,11 +3,11 @@
 // day            : 8
 // part           : 2
 
-#include <algorithm>
 #include <format>
 #include <functional>
 #include <list>
 #include <print>
+#include <queue>
 #include <ranges>
 #include <unordered_set>
 #include <vector>
@@ -15,6 +15,7 @@
 #include <ludutils/lud_assert.hpp>
 #include <ludutils/lud_misc.hpp>
 #include <ludutils/lud_parse.hpp>
+#include <ludutils/lud_timer.hpp>
 
 #define INPUT_PATH "inputs/day8/"
 
@@ -36,19 +37,7 @@ struct Point3D
     }
 };
 
-template <>
-struct std::formatter<Point3D>
-{
-
-    constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
-
-    auto format(const Point3D& o, std::format_context& ctx) const
-    {
-        return std::format_to(ctx.out(), "[{: >3d}, {: >3d}, {: >3d}]", o.x, o.y, o.z);
-    }
-};
-
-u64 distance(const Point3D& o1, const Point3D& o2)
+Point3D::SizeT distance(const Point3D& o1, const Point3D& o2)
 {
     Point3D::SizeT dx = (o2.x - o1.x) * (o2.x - o1.x);
     Point3D::SizeT dy = (o2.y - o1.y) * (o2.y - o1.y);
@@ -59,13 +48,13 @@ u64 distance(const Point3D& o1, const Point3D& o2)
 
 struct Point3DPair
 {
-    u64 distance;
+    Point3D::SizeT distance;
     Point3D p1;
     Point3D p2;
 
-    bool operator<(const Point3DPair& rhs) const
+    bool operator>(const Point3DPair& rhs) const
     {
-        return distance < rhs.distance;
+        return distance > rhs.distance;
     }
 };
 
@@ -83,17 +72,16 @@ u64 parse_num(const std::string_view sv)
     return Lud::is_num<Point3D::SizeT>(sv).value();
 }
 
-std::vector<Point3DPair> get_distances(std::vector<Point3D>& boxes)
+auto get_distances(std::vector<Point3D>& boxes)
 {
-    std::vector<Point3DPair> distances;
+    std::priority_queue<Point3DPair, std::vector<Point3DPair>, std::greater<>> distances;
     for (size_t i = 0; i < boxes.size(); i++)
     {
         for (size_t j = i + 1; j < boxes.size(); j++)
         {
-            distances.emplace_back(distance(boxes[i], boxes[j]), boxes[i], boxes[j]);
+            distances.emplace(distance(boxes[i], boxes[j]), boxes[i], boxes[j]);
         }
     }
-    std::ranges::sort(distances, std::less<>());
     return distances;
 }
 
@@ -115,8 +103,10 @@ u64 do_program(const char* path)
     auto distances = get_distances(boxes);
     std::list<std::unordered_set<Point3D>> circuits;
     Point3DPair last;
-    for (const auto& d : distances)
+    while (!distances.empty())
     {
+        auto d = distances.top();
+        distances.pop();
         auto it = circuits.begin();
         std::vector<decltype(it)> inserted;
         for (; it != circuits.end(); ++it)
