@@ -104,8 +104,7 @@ u64 do_program(const char* path, u64 connections)
     auto distances = get_distances(boxes);
 
     std::list<std::unordered_set<Point3D>> circuits;
-    size_t processed = 0;
-    while (!distances.empty() && processed < connections)
+    for (size_t processed = 0; processed < connections && !distances.empty(); processed++)
     {
         auto d = distances.top();
         distances.pop();
@@ -140,7 +139,6 @@ u64 do_program(const char* path, u64 connections)
             circuits.back().insert(d.p2);
         }
     skip_iter:
-        processed++;
     }
 
     circuits.sort([](const auto& elem1, const auto& elem2) { return elem1.size() > elem2.size(); });

@@ -10,12 +10,12 @@
 #include <queue>
 #include <ranges>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include <ludutils/lud_assert.hpp>
 #include <ludutils/lud_misc.hpp>
 #include <ludutils/lud_parse.hpp>
-#include <ludutils/lud_timer.hpp>
 
 #define INPUT_PATH "inputs/day8/"
 
@@ -101,8 +101,8 @@ u64 do_program(const char* path)
         boxes.emplace_back(c[0], c[1], c[2]);
     }
     auto distances = get_distances(boxes);
+
     std::list<std::unordered_set<Point3D>> circuits;
-    Point3DPair last;
     while (!distances.empty())
     {
         auto d = distances.top();
@@ -137,14 +137,13 @@ u64 do_program(const char* path)
             circuits.back().insert(d.p1);
             circuits.back().insert(d.p2);
         }
-        if (circuits.size() == 1)
+        if (circuits.front().size() == lines.size())
         {
-            last = d;
+            return d.p1.x * d.p2.x;
         }
     skip_iter:
     }
-
-    return last.p1.x * last.p2.x;
+    std::unreachable();
 }
 
 int main(int argc, char** argv)
