@@ -8,12 +8,11 @@
 #include <print>
 #include <ranges>
 #include <string_view>
+#include <unordered_set>
 
 #include <ludutils/lud_assert.hpp>
 #include <ludutils/lud_misc.hpp>
 #include <ludutils/lud_parse.hpp>
-#include <ludutils/lud_timer.hpp>
-#include <unordered_set>
 
 #define INPUT_PATH "inputs/day10/"
 
@@ -110,14 +109,11 @@ u64 do_program(const char* path)
     std::vector<machine> machines;
     machines.reserve(lines.size());
 
-    Lud::Timer parse("parse");
     for (const auto& line : lines)
     {
         machines.emplace_back(parse_machine(line));
     }
-    parse.Stop();
 
-    Lud::Timer timer("operation");
     return stdr::fold_left(machines | stdv::transform(bfs), 0UL, std::plus<>());
 }
 

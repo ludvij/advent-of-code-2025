@@ -35,11 +35,14 @@ else()
 	add_compile_options(-Wno-unused-parameter)
 	add_compile_options(-Wno-unused-function)
 	add_compile_options(-Wno-unused-but-set-variable)
+	# set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} 
+	# 	-pg
+	# )
 	if(CMAKE_BUILD_TYPE MATCHES "Debug")
-		add_compile_options(-fsanitize=address)
-		add_compile_options(-fno-omit-frame-pointer)
-		add_link_options(-fsanitize=address)
-		add_link_options(-fno-omit-frame-pointer)
+		set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} 
+			-fsanitize=address
+			-fno-omit-frame-pointer
+		)
 	endif()
 endif()
 
@@ -106,9 +109,10 @@ add_subdirectory(day9-complete)
 set_target_properties(2025_09_01 PROPERTIES FOLDER "DAY09")
 set_target_properties(2025_09_02 PROPERTIES FOLDER "DAY09")
 
-add_subdirectory(day10)
+add_subdirectory(day10-complete)
 
 set_target_properties(2025_10_01 PROPERTIES FOLDER "DAY10")
+set_target_properties(2025_10_02 PROPERTIES FOLDER "DAY10")
 
 add_subdirectory(day11-complete)
 

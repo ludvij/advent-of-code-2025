@@ -20,3 +20,5 @@ Makefile
 inputs/
 
 session.txt
+
+*.out

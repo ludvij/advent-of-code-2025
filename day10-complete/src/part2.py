@@ -7,13 +7,12 @@ input_path = 'inputs/day10'
 def parse_input(text:str) -> dict:
 	machines = []
 	for line in text:
-		parts = line.split(' ')
+		_, *buttons, joltage = (x[1:-1] for x in line.split())
 		machine = {
-			'buttons' : [[int(y) for y in x[1:-1].split(',')] for x in parts[1:-1]],
-			'joltage' : [int(x) for x in parts[-1][1:-1].split(',')]
+			'buttons' : [list(map(int, x.split(','))) for x in buttons],
+			'joltage' : list(map(int, joltage.split(',')))
 		}
 		machines.append(machine)
-
 	return machines
 
 
@@ -41,7 +40,8 @@ def do_program(path:str) -> int:
 		lp_problem.solve(lp_solver)
 
 		if pulp.LpStatus[lp_problem.status] == 'Optimal':
-			res += sum(int(pulp.value(x)) for x in lp_x_vars)
+			val = sum(int(pulp.value(x)) for x in lp_x_vars)
+			res += val
 
 	return res
 	
