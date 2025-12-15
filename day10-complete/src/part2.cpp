@@ -3,7 +3,6 @@
 // day            : 10
 // part           : 2
 
-#include "ludutils/lud_timer.hpp"
 #include <algorithm>
 #include <functional>
 #include <limits>
@@ -38,7 +37,7 @@ struct bfs_state
     std::unordered_set<u16> visited;
 };
 
-constexpr auto INVALID_SET = std::numeric_limits<u64>::max();
+constexpr auto INVALID_SET = std::numeric_limits<u32>::max();
 
 machine parse_machine(const std::string_view line)
 {
@@ -86,19 +85,22 @@ std::vector<u16> update_joltages(const std::vector<u16>& masks, std::vector<u16>
     return joltages;
 }
 
+size_t hash_joltage(const std::vector<u16>& joltages)
+{
+    u64 result = 0;
+    for (const u16 x : joltages)
+    {
+        result = result * 10 + x;
+    }
+    return result;
+}
+
 u64 subdivide(const machine& machine)
 {
     auto combinations = Lud::combinations(machine.masks);
-    std::unordered_map<u64, u64> memo;
 
-    const auto hash_joltage = [&](const std::vector<u16>& joltages) {
-        u64 result = 0;
-        for (const u16 x : joltages)
-        {
-            result = result * 10 + x;
-        }
-        return result;
-    };
+    std::unordered_map<u64, u64> memo;
+    std::unordered_map<u64, std::vector<std::vector<u16>>> parity;
 
     const auto recurse = [&](this auto& self, const std::vector<u16>& masks, const std::vector<u16>& joltages) -> u64 {
         if (r::all_of(joltages, [](u16 x) { return x == 0; }))
@@ -112,15 +114,24 @@ u64 subdivide(const machine& machine)
         }
 
         // create the target mask using parity
-        u16 target = r::fold_left(v::iota(0uz, joltages.size()), u16{}, [&](u16 res, u16 x) { return res | (joltages[x] % 2) << x; });
+        u16 target = 0;
+        for (size_t i = 0; i < joltages.size(); i++)
+        {
+            target |= (joltages[i] & 1) << i;
+        }
 
-        // compute all possible button combinations to reach that target
-
-        auto valid = combinations |
-                     v::filter([&](const auto& set) { return validate_combination(set, target); });
+        if (!parity.contains(target))
+        {
+            parity.emplace(
+                target,
+                combinations |
+                    v::filter([&](const auto& set) { return validate_combination(set, target); }) |
+                    r::to<std::vector>()
+            );
+        }
 
         u64 min = INVALID_SET;
-        for (const auto& combination : valid)
+        for (const auto& combination : parity.at(target))
         {
             auto next = update_joltages(combination, joltages);
 
@@ -128,25 +139,20 @@ u64 subdivide(const machine& machine)
             {
                 continue;
             }
-            r::for_each(next, [](u16& elem) { elem /= 2; });
 
-            const u64 half_presses = self(masks, next);
-            if (half_presses == INVALID_SET)
+            for (auto& j : next)
             {
-                continue;
+                j /= 2;
             }
 
-            const u64 presses = 2 * half_presses + combination.size();
+            const u64 presses = 2 * self(masks, next) + combination.size();
 
             if (presses < min)
             {
                 min = presses;
             }
         }
-        if (min != INVALID_SET)
-        {
-            memo.emplace(hash, min);
-        }
+        memo.emplace(hash, min);
         return min;
     };
     return recurse(machine.masks, machine.joltage);
@@ -164,7 +170,6 @@ u64 do_program(const char* path)
     {
         machines.push_back(parse_machine(line));
     }
-    Lud::Timer timer("operation");
     return r::fold_left(machines | v::transform(subdivide), 0UL, std::plus<>());
 }
 
