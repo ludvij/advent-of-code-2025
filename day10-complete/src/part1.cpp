@@ -106,15 +106,13 @@ u64 do_program(const char* path)
     const auto file = Lud::Slurp(path);
     const auto lines = Lud::Split(file, '\n');
 
-    std::vector<machine> machines;
-    machines.reserve(lines.size());
-
-    for (const auto& line : lines)
-    {
-        machines.emplace_back(parse_machine(line));
-    }
-
-    return stdr::fold_left(machines | stdv::transform(bfs), 0UL, std::plus<>());
+    return stdr::fold_left(
+        lines |
+            stdv::transform(parse_machine) |
+            stdv::transform(bfs),
+        0UL,
+        std::plus<>()
+    );
 }
 
 int main(int argc, char** argv)

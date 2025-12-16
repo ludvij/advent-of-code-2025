@@ -35,9 +35,6 @@ else()
 	add_compile_options(-Wno-unused-parameter)
 	add_compile_options(-Wno-unused-function)
 	add_compile_options(-Wno-unused-but-set-variable)
-	# set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} 
-	# 	-pg
-	# )
 	if(CMAKE_BUILD_TYPE MATCHES "Debug")
 		set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} 
 			-fsanitize=address

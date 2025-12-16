@@ -8,7 +8,6 @@
 #include <limits>
 #include <print>
 #include <ranges>
-#include <unordered_set>
 
 #include <ludutils/lud_assert.hpp>
 #include <ludutils/lud_misc.hpp>
@@ -19,27 +18,21 @@
 namespace v = std::views;
 namespace r = std::ranges;
 
-struct machine
+struct Machine
 {
     std::vector<u16> masks;
     std::vector<u16> joltage;
 
-    machine(auto b, auto j)
+    Machine(auto b, auto j)
         : masks(b.begin(), b.end())
         , joltage(j.begin(), j.end())
     {
     }
 };
 
-struct bfs_state
-{
-    u16 current;
-    std::unordered_set<u16> visited;
-};
-
 constexpr auto INVALID_SET = std::numeric_limits<u32>::max();
 
-machine parse_machine(const std::string_view line)
+Machine parse_machine(const std::string_view line)
 {
     const auto parts = Lud::Split(line, ' ');
     const auto filtered = parts | v::transform([](const auto& s) { return s.substr(1, s.size() - 2); });
@@ -63,14 +56,9 @@ machine parse_machine(const std::string_view line)
     };
 }
 
-auto validate_combination(const auto& combination, u16 target)
+bool validate_combination(const auto& combination, u16 target)
 {
-    u16 current = 0;
-    for (const u16 mask : combination)
-    {
-        current ^= mask;
-    }
-    return current == target;
+    return r::fold_left(combination, 0UL, std::bit_xor<>()) == target;
 }
 
 std::vector<u16> update_joltages(const std::vector<u16>& masks, std::vector<u16> joltages)
@@ -85,30 +73,19 @@ std::vector<u16> update_joltages(const std::vector<u16>& masks, std::vector<u16>
     return joltages;
 }
 
-size_t hash_joltage(const std::vector<u16>& joltages)
-{
-    u64 result = 0;
-    for (const u16 x : joltages)
-    {
-        result = result * 10 + x;
-    }
-    return result;
-}
-
-u64 subdivide(const machine& machine)
+u64 subdivide(const Machine& machine)
 {
     auto combinations = Lud::combinations(machine.masks);
 
-    std::unordered_map<u64, u64> memo;
-    std::unordered_map<u64, std::vector<std::vector<u16>>> parity;
+    std::unordered_map<std::vector<u16>, u64, Lud::HashNumericVector<u16>> memo;
+    std::unordered_map<u64, std::vector<std::vector<u16>>> validated;
 
-    const auto recurse = [&](this auto& self, const std::vector<u16>& masks, const std::vector<u16>& joltages) -> u64 {
+    const auto recurse = [&](this auto& self, const std::vector<u16>& joltages) -> u64 {
         if (r::all_of(joltages, [](u16 x) { return x == 0; }))
         {
             return 0;
         }
-        const auto hash = hash_joltage(joltages);
-        if (auto it = memo.find(hash); it != memo.end())
+        if (auto it = memo.find(joltages); it != memo.end())
         {
             return it->second;
         }
@@ -120,18 +97,20 @@ u64 subdivide(const machine& machine)
             target |= (joltages[i] & 1) << i;
         }
 
-        if (!parity.contains(target))
+        if (!validated.contains(target))
         {
-            parity.emplace(
+            validated.emplace(
                 target,
                 combinations |
-                    v::filter([&](const auto& set) { return validate_combination(set, target); }) |
+                    v::filter([&](const auto& set) {
+                        return validate_combination(set, target);
+                    }) |
                     r::to<std::vector>()
             );
         }
 
         u64 min = INVALID_SET;
-        for (const auto& combination : parity.at(target))
+        for (const auto& combination : validated.at(target))
         {
             auto next = update_joltages(combination, joltages);
 
@@ -145,17 +124,23 @@ u64 subdivide(const machine& machine)
                 j /= 2;
             }
 
-            const u64 presses = 2 * self(masks, next) + combination.size();
+            const u64 half = self(next);
+            if (half == INVALID_SET)
+            {
+                continue;
+            }
+
+            const u64 presses = 2 * half + combination.size();
 
             if (presses < min)
             {
                 min = presses;
             }
         }
-        memo.emplace(hash, min);
+        memo.emplace(joltages, min);
         return min;
     };
-    return recurse(machine.masks, machine.joltage);
+    return recurse(machine.joltage);
 }
 
 u64 do_program(const char* path)
@@ -163,14 +148,13 @@ u64 do_program(const char* path)
     const auto file = Lud::Slurp(path);
     const auto lines = Lud::Split(file, '\n');
 
-    std::vector<machine> machines;
-    machines.reserve(lines.size());
-
-    for (const auto& line : lines)
-    {
-        machines.push_back(parse_machine(line));
-    }
-    return r::fold_left(machines | v::transform(subdivide), 0UL, std::plus<>());
+    return r::fold_left(
+        lines |
+            v::transform(parse_machine) |
+            v::transform(subdivide),
+        0UL,
+        std::plus<>()
+    );
 }
 
 int main(int argc, char** argv)
